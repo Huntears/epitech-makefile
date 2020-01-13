@@ -1,41 +1,11 @@
 ##
 ## EPITECH PROJECT, 2019
-## my_runner
+## epitech-makefile
 ## File description:
-## The Makefile for my_runner
+## Generic Makefile for Epitech
 ##
 
-SRC 	=	src/runner/my_runner.c	\
-			src/runner/init/init_window.c 	\
-			src/runner/handle_events.c 	\
-			src/runner/physics/apply_gravity.c	\
-			src/runner/handle_key_pressed.c	\
-			src/runner/init/init_game_objects.c 	\
-			src/runner/init/init_player.c	\
-			src/runner/init/init_parralax.c	\
-			src/runner/destroy/destroy_game_objects.c 	\
-			src/runner/destroy/destroy_player.c 	\
-			src/runner/destroy/destroy_parralax.c 	\
-			src/runner/display/display_objects.c	\
-			src/runner/display/display_player.c	\
-			src/runner/display/display_parralax.c	\
-			src/runner/physics/is_sprite_colliding.c	\
-			src/runner/init/init_map.c	\
-			src/runner/display/display_map.c	\
-			src/runner/utility/get_next_line.c	\
-			src/runner/physics/check_collisions.c	\
-			src/runner/destroy/destroy_map.c	\
-			src/runner/wait_for_input.c	\
-			src/runner/helper.c	\
-			src/runner/is_won.c	\
-			src/runner/sound/sound_jump.c	\
-			src/runner/init/init_sound.c	\
-			src/runner/destroy/destroy_sound.c	\
-			src/runner/init/init_score.c	\
-			src/runner/display/display_score.c	\
-			src/runner/destroy/destroy_score.c	\
-			src/runner/utility/int_to_string.c	\
-			src/runner/final_screen.c	\
+SRC 	=	src/your-source.c	\
 
 OBJ 	=	$(SRC:.c=.o)
 
@@ -43,27 +13,34 @@ MAIN_SRC	=	src/main.c 	\
 
 MAIN_OBJ	=	$(MAIN_SRC:.c=.o)
 
+TEST_SRC	=	tests/test_your_test.c	\
+
+TEST_OBJ	=	$(TEST_SRC:.c=.o)
+
 CFLAGS	=	-I./include -Wall -Wextra -Werror
 
-LFLAGS	=	-L./lib -lcorn -lmy -lcsfml-graphics -lcsfml-system -lcsfml-window -lcsfml-audio
+LFLAGS	=	-L./lib -lmy
+
+TEST_LFLAGS	=	-lcriterion
 
 COVERAGE	=	$(SRC:.c=.gcda)	\
 				$(SRC:.c=.gcno)	\
 				$(MAIN_SRC:.c=.gcno)	\
 				$(MAIN_SRC:.c=.gcno)	\
 
-TARGET	=	my_runner
+TARGET	=	your_target
+
+TARGET_TEST	=	unit_tests
+
+#-------------------------------------------------------------------------------
 
 all:	$(TARGET)
 
 $(TARGET): build_lib build
 
 build_lib:
-	@cd ./lib/libcorn/ && $(MAKE) --silent
 	@cd ./lib/libmy/ && $(MAKE) --silent
-	@cp ./lib/libcorn/libcorn.a ./lib/libcorn.a
 	@cp ./lib/libmy/libmy.a ./lib/libmy.a
-	@cp ./lib/libcorn/include/corn.h ./include/corn.h
 	@cp ./lib/libmy/include/my.h ./include/my.h
 
 %.o : %.c
@@ -78,11 +55,9 @@ build: $(OBJ) $(MAIN_OBJ)
 	@printf "\e[1;32mLinked all object files\e[0m\n"
 
 clean_lib:
-	@cd lib/libcorn/ && $(MAKE) --silent clean
 	@cd lib/libmy/ && $(MAKE) --silent clean
 
 fclean_lib:
-	@cd lib/libcorn/ && $(MAKE) --silent fclean
 	@cd lib/libmy/ && $(MAKE) --silent fclean
 
 clean: clean_lib
@@ -97,7 +72,19 @@ fclean: fclean_lib clean
 
 re:	fclean all
 
-valgrind: all
-	@valgrind --suppressions=valgrind.supp --leak-check=full --show-leak-kinds=all ./my_runner a
+tests_run: CFLAGS += --coverage
+tests_run: build_lib $(OBJ) $(TEST_OBJ)
+	@printf "\e[1;32mFinished compiling sources\e[0m\n"
+	@$(CC) $(OBJ) $(TEST_OBJ) -o $(TARGET_TEST) $(LFLAGS) $(TEST_LFLAGS)
+	@printf "[\e[1;33mLinked\e[0m] % 43s\n" $(OBJ) | tr ' ' '.'
+	@printf "[\e[1;33mLinked\e[0m] % 43s\n" $(TEST_OBJ) | tr ' ' '.'
+	@printf "\e[1;33mLaunching tests...\e[0m]\n"
+	@./$(TARGET_TEST)
+	@gcovr --exclude tests/
 
-.PHONY:	re fclean clean fclean_lib clean_lib build build_lib all
+re_tests: fclean tests_run
+
+valgrind: all
+	@valgrind --leak-check=full --show-leak-kinds=all ./$(TARGET)
+
+.PHONY:	re fclean clean fclean_lib clean_lib build build_lib all tests_run re_tests
