@@ -78,7 +78,7 @@ tests_run: build_lib $(OBJ) $(TEST_OBJ)
 	@$(CC) $(OBJ) $(TEST_OBJ) -o $(TARGET_TEST) $(LFLAGS) $(TEST_LFLAGS)
 	@printf "[\e[1;33mLinked\e[0m] % 43s\n" $(OBJ) | tr ' ' '.'
 	@printf "[\e[1;33mLinked\e[0m] % 43s\n" $(TEST_OBJ) | tr ' ' '.'
-	@printf "\e[1;33mLaunching tests...\e[0m]\n"
+	@printf "\e[1;32mLaunching tests...\e[0m]\n"
 	@./$(TARGET_TEST)
 	@gcovr --exclude tests/
 
