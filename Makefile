@@ -75,7 +75,7 @@ re:	fclean all
 tests_run: CFLAGS += --coverage
 tests_run: build_lib $(OBJ) $(TEST_OBJ)
 	@printf "\e[1;32mFinished compiling sources\e[0m\n"
-	@$(CC) $(OBJ) $(TEST_OBJ) -o $(TARGET_TEST) $(LFLAGS) $(TEST_LFLAGS)
+	@$(CC) $(CFLAGS) $(OBJ) $(TEST_OBJ) -o $(TARGET_TEST) $(LFLAGS) $(TEST_LFLAGS)
 	@printf "[\e[1;33mLinked\e[0m] % 43s\n" $(OBJ) | tr ' ' '.'
 	@printf "[\e[1;33mLinked\e[0m] % 43s\n" $(TEST_OBJ) | tr ' ' '.'
 	@printf "\e[1;32mLaunching tests...\e[0m]\n"
