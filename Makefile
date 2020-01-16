@@ -25,8 +25,10 @@ TEST_LFLAGS	=	-lcriterion
 
 COVERAGE	=	$(SRC:.c=.gcda)	\
 				$(SRC:.c=.gcno)	\
+				$(MAIN_SRC:.c=.gcda)	\
 				$(MAIN_SRC:.c=.gcno)	\
-				$(MAIN_SRC:.c=.gcno)	\
+				$(TEST_SRC:.c=.gcno)	\
+				$(TEST_SRC:.c=.gcda)	\
 
 TARGET	=	your_target
 
@@ -59,14 +61,15 @@ clean_lib:
 
 fclean_lib:
 	@cd lib/libmy/ && $(MAKE) --silent fclean
+	@rm -f lib/libmy.a
 
 clean: clean_lib
-	@rm -f $(OBJ) $(MAIN_OBJ) $(COVERAGE)
+	@rm -f $(OBJ) $(MAIN_OBJ) $(TEST_OBJ) $(COVERAGE)
 	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(OBJ) | tr ' ' '.'
 	@printf "\e[1;32mFinished removing objects\e[0m\n"
 
 fclean: fclean_lib clean
-	@rm -f $(TARGET)
+	@rm -f $(TARGET) $(TARGET_TEST)
 	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(TARGET) | tr ' ' '.'
 	@printf "\e[1;32mFinished removing linked binaries\e[0m\n"
 
