@@ -66,11 +66,15 @@ fclean_lib:
 clean: clean_lib
 	@rm -f $(OBJ) $(MAIN_OBJ) $(TEST_OBJ) $(COVERAGE)
 	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(OBJ) | tr ' ' '.'
+	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(MAIN_OBJ) | tr ' ' '.'
+	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(TEST_OBJ) | tr ' ' '.'
+	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(COVERAGE) | tr ' ' '.'
 	@printf "\e[1;32mFinished removing objects\e[0m\n"
 
 fclean: fclean_lib clean
 	@rm -f $(TARGET) $(TARGET_TEST)
 	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(TARGET) | tr ' ' '.'
+	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(TARGET_TEST) | tr ' ' '.'
 	@printf "\e[1;32mFinished removing linked binaries\e[0m\n"
 
 re:	fclean all
