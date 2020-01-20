@@ -19,6 +19,12 @@ TEST_SRC	=	tests/test_your_test.c	\
 
 TEST_OBJ	=	$(TEST_SRC:.c=.o)
 
+CPPFLAGS	=	-MD -MP
+
+CPPDEPS	=	$(SRC:.c=.d)	\
+			$(TEST_SRC:.c=.d)	\
+			$(MAIN_SRC:.c=.d)	\
+
 CFLAGS	=	-I./include -Wall -Wextra -Werror
 
 LFLAGS	=	-L./lib -lmy
@@ -48,7 +54,7 @@ build_lib: ## Compile the libs
 	@cp ./lib/libmy/include/my.h ./include/my.h
 
 %.o: %.c ## Compile the objects
-	@$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 	@printf "[\e[1;34mCompiled\e[0m] % 41s\n" $@ | tr ' ' '.'
 
 build: $(OBJ) $(MAIN_OBJ) ## Build the main binary
@@ -66,11 +72,12 @@ fclean_lib: ## Force clean the libs
 	@rm -f lib/libmy.a
 
 clean: clean_lib ## Clean the project
-	@rm -f $(OBJ) $(MAIN_OBJ) $(TEST_OBJ) $(COVERAGE)
+	@rm -f $(OBJ) $(MAIN_OBJ) $(TEST_OBJ) $(COVERAGE) $(CPPDEPS)
 	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(OBJ) | tr ' ' '.'
 	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(MAIN_OBJ) | tr ' ' '.'
 	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(TEST_OBJ) | tr ' ' '.'
 	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(COVERAGE) | tr ' ' '.'
+	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(CPPDEPS) | tr ' ' '.'
 	@printf "\e[1;32mFinished removing objects\e[0m\n"
 
 fclean: fclean_lib clean ## Force clean the project
@@ -100,3 +107,5 @@ help: ## Help for the Makefile
 	@cat $(MAKEFILE_LIST) | sed -En 's/^([a-zA-Z_-]+)\s*:.*##\s?(.*)/\1 "\2"/p' | xargs printf "\033[36m%-30s\033[0m %s\n"
 
 .PHONY:	re fclean clean fclean_lib clean_lib build build_lib all tests_run re_tests help valgrind
+
+-include $(CPPDEPS)
