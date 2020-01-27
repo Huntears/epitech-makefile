@@ -25,7 +25,7 @@ CPPDEPS	=	$(SRC:.c=.d)	\
 			$(TEST_SRC:.c=.d)	\
 			$(MAIN_SRC:.c=.d)	\
 
-CFLAGS	=	-I./include -Wall -Wextra -Werror
+CFLAGS	=	-I./include -Wall -Wextra -Werror -pedantic
 
 LFLAGS	=	-L./lib -lmy
 
@@ -49,7 +49,7 @@ all:	$(TARGET) ## Build the main binary with libs
 $(TARGET) : build_lib build
 
 build_lib: ## Compile the libs
-	@cd ./lib/libmy/ && $(MAKE) --silent
+	@$(MAKE) -C ./lib/libmy/ --silent
 	@cp ./lib/libmy/libmy.a ./lib/libmy.a
 	@cp ./lib/libmy/include/my.h ./include/my.h
 
@@ -65,10 +65,10 @@ build: $(OBJ) $(MAIN_OBJ) ## Build the main binary
 	@printf "\e[1;32mLinked all object files\e[0m\n"
 
 clean_lib: ## Clean the libs
-	@cd lib/libmy/ && $(MAKE) --silent clean
+	@$(MAKE) -C ./lib/libmy/ --silent clean
 
 fclean_lib: ## Force clean the libs
-	@cd lib/libmy/ && $(MAKE) --silent fclean
+	@$(MAKE) -C ./lib/libmy/ --silent fclean
 	@rm -f lib/libmy.a
 
 clean: clean_lib ## Clean the project
