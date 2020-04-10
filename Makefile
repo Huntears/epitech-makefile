@@ -19,13 +19,7 @@ TEST_SRC	=	tests/test_your_test.c	\
 
 TEST_OBJ	=	$(TEST_SRC:.c=.o)
 
-CPPFLAGS	=	-MD -MP
-
-CPPDEPS	=	$(SRC:.c=.d)	\
-			$(TEST_SRC:.c=.d)	\
-			$(MAIN_SRC:.c=.d)	\
-
-CFLAGS	=	-I./include -Wall -Wextra -Werror -pedantic
+CFLAGS	=	-I./include -Wall -Wextra -pedantic
 
 LFLAGS	=	-L./lib -lmy
 
@@ -54,15 +48,14 @@ build_lib: ## Compile the libs
 	@cp ./lib/libmy/include/my.h ./include/my.h
 
 %.o: %.c ## Compile the objects
-	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 	@printf "[\e[1;34mCompiled\e[0m] % 41s\n" $@ | tr ' ' '.'
 
 build: $(OBJ) $(MAIN_OBJ) ## Build the main binary
 	@printf "\e[1;32mFinished compiling sources\e[0m\n"
+	@printf "\e[1;33mLinking all object files...\e[0m\n"
 	@$(CC) $(OBJ) $(MAIN_OBJ) -o $(TARGET) $(LFLAGS)
-	@printf "[\e[1;33mLinked\e[0m] % 43s\n" $(OBJ) | tr ' ' '.'
-	@printf "[\e[1;33mLinked\e[0m] % 43s\n" $(MAIN_OBJ) | tr ' ' '.'
-	@printf "\e[1;32mLinked all object files\e[0m\n"
+	@printf "\e[1;33mLinked all object files\e[0m\n"
 
 clean_lib: ## Clean the libs
 	@$(MAKE) -C ./lib/libmy/ --silent clean
@@ -72,28 +65,25 @@ fclean_lib: ## Force clean the libs
 	@rm -f lib/libmy.a
 
 clean: clean_lib ## Clean the project
-	@rm -f $(OBJ) $(MAIN_OBJ) $(TEST_OBJ) $(COVERAGE) $(CPPDEPS)
-	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(OBJ) | tr ' ' '.'
-	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(MAIN_OBJ) | tr ' ' '.'
-	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(TEST_OBJ) | tr ' ' '.'
-	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(COVERAGE) | tr ' ' '.'
-	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(CPPDEPS) | tr ' ' '.'
-	@printf "\e[1;32mFinished removing objects\e[0m\n"
+	@printf "\e[1;31mRemoving object files...\e[0m\n"
+	@rm -f $(OBJ) $(MAIN_OBJ) $(TEST_OBJ)
+	@printf "\e[1;31mRemoved object files\e[0m\n"
+	@printf "\e[1;31mRemoving coverage files...\e[0m\n"
+	@rm -f $(COVERAGE)
+	@printf "\e[1;31mRemoved coverage files\e[0m\n"
 
 fclean: fclean_lib clean ## Force clean the project
 	@rm -f $(TARGET) $(TARGET_TEST)
-	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(TARGET) | tr ' ' '.'
-	@printf "[\e[1;31mRemoved\e[0m] % 42s\n" $(TARGET_TEST) | tr ' ' '.'
-	@printf "\e[1;32mFinished removing linked binaries\e[0m\n"
+	@printf "\e[1;31mRemoved linked binaries\e[0m\n"
 
 re:	fclean all ## Force clean then compile
 
 tests_run: CFLAGS += --coverage ## Launch tests
 tests_run: build_lib $(OBJ) $(TEST_OBJ)
 	@printf "\e[1;32mFinished compiling sources\e[0m\n"
+	@printf "\e[1;33mLinking all object files...\e[0m\n"
 	@$(CC) $(CFLAGS) $(OBJ) $(TEST_OBJ) -o $(TARGET_TEST) $(LFLAGS) $(TEST_LFLAGS)
-	@printf "[\e[1;33mLinked\e[0m] % 43s\n" $(OBJ) | tr ' ' '.'
-	@printf "[\e[1;33mLinked\e[0m] % 43s\n" $(TEST_OBJ) | tr ' ' '.'
+	@printf "\e[1;33mLinked all object files\e[0m\n"
 	@printf "\e[1;32mLaunching tests...\e[0m]\n"
 	@./$(TARGET_TEST)
 	@gcovr --exclude tests/
@@ -107,5 +97,3 @@ help: ## Help for the Makefile
 	@cat $(MAKEFILE_LIST) | sed -En 's/^([a-zA-Z_-]+)\s*:.*##\s?(.*)/\1 "\2"/p' | xargs printf "\033[36m%-30s\033[0m %s\n"
 
 .PHONY:	re fclean clean fclean_lib clean_lib build build_lib all tests_run re_tests help valgrind
-
--include $(CPPDEPS)
